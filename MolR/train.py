@@ -3,7 +3,7 @@ import torch
 import pickle
 import data_processing
 import numpy as np
-from model import GNN
+from MolR.model import GNN
 from copy import deepcopy
 from dgl.dataloading import GraphDataLoader
 

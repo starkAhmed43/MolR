@@ -6,7 +6,7 @@ import pickle
 import pysmiles
 import itertools
 import multiprocessing as mp
-from data_processing import networkx_to_dgl
+from MolR.data_processing import networkx_to_dgl
 from networkx.algorithms.similarity import graph_edit_distance
 
 random.seed(0)

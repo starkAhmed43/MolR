@@ -3,7 +3,7 @@ import dgl
 import torch
 import pickle
 import pysmiles
-from data_processing import networkx_to_dgl
+from MolR.data_processing import networkx_to_dgl
 
 
 class PropertyPredDataset(dgl.data.DGLDataset):

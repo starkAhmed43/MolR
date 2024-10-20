@@ -6,14 +6,14 @@ import matplotlib
 import numpy as np
 import multiprocessing as mp
 import matplotlib.pyplot as plt
-from model import GNN
+from MolR.model import GNN
 from openbabel import pybel
-from featurizer import MolEFeaturizer
+from MolR.featurizer import MolEFeaturizer
 from dgl.dataloading import GraphDataLoader
 from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
 from networkx.algorithms.similarity import graph_edit_distance
-from property_pred.pp_data_processing import PropertyPredDataset
+from MolR.property_pred.pp_data_processing import PropertyPredDataset
 
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['ps.fonttype'] = 42

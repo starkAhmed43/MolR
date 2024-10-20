@@ -1,10 +1,10 @@
 import os
 import argparse
-import data_processing
-import train
-from property_pred import pp_data_processing, pp_train
-from ged_pred import gp_data_processing, gp_train
-from visualization import visualize
+from MolR import data_processing
+from MolR import train
+from MolR.property_pred import pp_data_processing, pp_train
+from MolR.ged_pred import gp_data_processing, gp_train
+from MolR.visualization import visualize
 
 
 def print_setting(args):

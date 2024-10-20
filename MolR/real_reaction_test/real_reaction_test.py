@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.spatial.distance import cdist
-from featurizer import MolEFeaturizer
+from MolR.featurizer import MolEFeaturizer
 
 
 model = MolEFeaturizer(path_to_model='../../saved/gcn_1024')

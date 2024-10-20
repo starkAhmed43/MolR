@@ -1,9 +1,9 @@
 import torch
 import pickle
-from model import GNN
+from MolR.model import GNN
 from dgl.dataloading import GraphDataLoader
-from sklearn.svm import SVR
-from sklearn.metrics import mean_absolute_error, mean_squared_error
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import roc_auc_score
 
 
 def train(args, data):
@@ -21,23 +21,15 @@ def train(args, data):
         mole.load_state_dict(torch.load(path + 'model.pt', map_location=torch.device('cpu')))
 
     dataloader = GraphDataLoader(data, batch_size=args.batch_size, shuffle=True)
-    all_features1 = []
-    all_features2 = []
+    all_features = []
     all_labels = []
     with torch.no_grad():
         mole.eval()
-        for graphs1, graphs2, labels in dataloader:
-            graph_embeddings1 = mole(graphs1)
-            graph_embeddings2 = mole(graphs2)
-            all_features1.append(graph_embeddings1)
-            all_features2.append(graph_embeddings2)
+        for graphs, labels in dataloader:
+            graph_embeddings = mole(graphs)
+            all_features.append(graph_embeddings)
             all_labels.append(labels)
-        all_features1 = torch.cat(all_features1, dim=0)
-        all_features2 = torch.cat(all_features2, dim=0)
-        if args.feature_mode == 'concat':
-            all_features = torch.cat([all_features1, all_features2], dim=-1).cpu().numpy()
-        elif args.feature_mode == 'subtract':
-            all_features = (all_features1 - all_features2).cpu().numpy()
+        all_features = torch.cat(all_features, dim=0).cpu().numpy()
         all_labels = torch.cat(all_labels, dim=0).cpu().numpy()
 
     print('splitting dataset')
@@ -48,16 +40,15 @@ def train(args, data):
     test_features = all_features[int(0.9 * len(data)):]
     test_labels = all_labels[int(0.9 * len(data)):]
 
-    print('training the regression model\n')
-    pred_model = SVR()
+    print('training the classification model\n')
+    pred_model = LogisticRegression(solver='liblinear')
     pred_model.fit(train_features, train_labels)
-    run_regression(pred_model, 'train', train_features, train_labels)
-    run_regression(pred_model, 'valid', valid_features, valid_labels)
-    run_regression(pred_model, 'test', test_features, test_labels)
+    run_classification(pred_model, 'train', train_features, train_labels)
+    run_classification(pred_model, 'valid', valid_features, valid_labels)
+    run_classification(pred_model, 'test', test_features, test_labels)
 
 
-def run_regression(model, mode, features, labels):
-    pred = model.predict(features)
-    mae = mean_absolute_error(labels, pred)
-    rmse = mean_squared_error(labels, pred, squared=False)
-    print('%s mae: %.4f   rmse: %.4f' % (mode, mae, rmse))
+def run_classification(model, mode, features, labels):
+    acc = model.score(features, labels)
+    auc = roc_auc_score(labels, model.predict_proba(features)[:, 1])
+    print('%s acc: %.4f   auc: %.4f' % (mode, acc, auc))

@@ -3,14 +3,15 @@ import dgl
 import torch
 import pysmiles
 import numpy as np
-from model import GNN
+import pkg_resources
+from MolR.model import GNN
 from dgl.dataloading import GraphDataLoader
-from data_processing import networkx_to_dgl
+from MolR.data_processing import networkx_to_dgl
 
 
 class GraphDataset(dgl.data.DGLDataset):
-    def __init__(self, path_to_model, smiles_list, gpu):
-        self.path = path_to_model
+    def __init__(self, model, smiles_list, gpu):
+        self.path = pkg_resources.resource_filename(__name__, f'models/{model}/')
         self.smiles_list = smiles_list
         self.gpu = gpu
         self.parsed = []
@@ -18,7 +19,7 @@ class GraphDataset(dgl.data.DGLDataset):
         super().__init__(name='graph_dataset')
 
     def process(self):
-        with open(self.path + '/feature_enc.pkl', 'rb') as f:
+        with open(self.path + 'feature_enc.pkl', 'rb') as f:
             feature_encoder = pickle.load(f)
         for i, smiles in enumerate(self.smiles_list):
             try:
@@ -27,10 +28,10 @@ class GraphDataset(dgl.data.DGLDataset):
                 self.graphs.append(dgl_graph)
                 self.parsed.append(i)
             except:
-                print('ERROR: No. %d smiles is not parsed successfully' % i)
-        print('the number of smiles successfully parsed: %d' % len(self.parsed))
-        print('the number of smiles failed to be parsed: %d' % (len(self.smiles_list) - len(self.parsed)))
-        if torch.cuda.is_available() and self.gpu is not None:
+                pass
+        print(f'{len(self.parsed)} SMILES were successfully parsed')
+        print(f'{len(self.smiles_list) - len(self.parsed)} SMILES failed to be parsed')
+        if torch.cuda.is_available() and self.gpu:
             self.graphs = [graph.to('cuda:' + str(self.gpu)) for graph in self.graphs]
 
     def __getitem__(self, i):
@@ -39,24 +40,24 @@ class GraphDataset(dgl.data.DGLDataset):
     def __len__(self):
         return len(self.graphs)
 
-
 class MolEFeaturizer(object):
-    def __init__(self, path_to_model, gpu=0):
-        self.path_to_model = path_to_model
+    def __init__(self, model='gcn_1024', gpu=0):
+        self.model_name = model
         self.gpu = gpu
-        with open(path_to_model + '/hparams.pkl', 'rb') as f:
+        self.path_to_model = pkg_resources.resource_filename(__name__, f'models/{model}/')
+
+        with open(self.path_to_model + 'hparams.pkl', 'rb') as f:
             hparams = pickle.load(f)
         self.mole = GNN(hparams['gnn'], hparams['layer'], hparams['feature_len'], hparams['dim'])
         self.dim = hparams['dim']
-        if torch.cuda.is_available() and gpu is not None:
-            self.mole.load_state_dict(torch.load(path_to_model + '/model.pt'))
-            self.mole = self.mole.cuda(gpu)
-        else:
-            self.mole.load_state_dict(torch.load(path_to_model + '/model.pt', map_location=torch.device('cpu')))
+
+        device = torch.device(f'cuda:{gpu}' if torch.cuda.is_available() and gpu else 'cpu')
+        self.mole.load_state_dict(torch.load(self.path_to_model + 'model.pt', map_location=device))
+        self.mole = self.mole.to(device)
 
     def transform(self, smiles_list, batch_size=None):
-        data = GraphDataset(self.path_to_model, smiles_list, self.gpu)
-        dataloader = GraphDataLoader(data, batch_size=batch_size if batch_size is not None else len(smiles_list))
+        data = GraphDataset(self.model_name, smiles_list, self.gpu)
+        dataloader = GraphDataLoader(data, batch_size=batch_size if batch_size  else len(smiles_list))
         all_embeddings = np.zeros((len(smiles_list), self.dim), dtype=float)
         flags = np.zeros(len(smiles_list), dtype=bool)
         res = []
@@ -68,7 +69,6 @@ class MolEFeaturizer(object):
             res = torch.cat(res, dim=0).cpu().numpy()
         all_embeddings[data.parsed, :] = res
         flags[data.parsed] = True
-        print('done\n')
         return all_embeddings, flags
 
 
