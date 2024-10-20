@@ -1,4 +1,7 @@
-# Project exclude paths
+# Project exclude path
+__pycache__
+MolR.egg-info/
+build/
 /venv/
 /.idea/
 /data/USPTO-479k/cache
