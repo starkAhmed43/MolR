@@ -52,12 +52,12 @@ class MolEFeaturizer(object):
         self.dim = hparams['dim']
 
         device = torch.device(f'cuda:{gpu}' if torch.cuda.is_available() and gpu else 'cpu')
-        self.mole.load_state_dict(torch.load(self.path_to_model + 'model.pt', map_location=device))
+        self.mole.load_state_dict(torch.load(self.path_to_model + 'model.pt', map_location=device, weights_only=True))
         self.mole = self.mole.to(device)
 
     def transform(self, smiles_list, batch_size=None):
         data = GraphDataset(self.model_name, smiles_list, self.gpu)
-        dataloader = GraphDataLoader(data, batch_size=batch_size if batch_size  else len(smiles_list))
+        dataloader = GraphDataLoader(data, batch_size=batch_size if batch_size else len(smiles_list))
         all_embeddings = np.zeros((len(smiles_list), self.dim), dtype=float)
         flags = np.zeros(len(smiles_list), dtype=bool)
         res = []
