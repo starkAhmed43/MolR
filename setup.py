@@ -1,20 +1,13 @@
 import sys
+import importlib.metadata
 from setuptools import setup, find_packages
 
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
 python_version = f"{sys.version_info.major}{sys.version_info.minor}"
-dgl_wheel_url = None
-if python_version == "310":
-    dgl_wheel_url = "https://data.dgl.ai/wheels/torch-2.4/cu118/dgl-2.4.0%2Bcu118-cp310-cp310-manylinux1_x86_64.whl"
-elif python_version == "311":
-    dgl_wheel_url = "https://data.dgl.ai/wheels/torch-2.4/cu118/dgl-2.4.0%2Bcu118-cp311-cp311-manylinux1_x86_64.whl"
-elif python_version == "38":
-    dgl_wheel_url = "https://data.dgl.ai/wheels/torch-2.4/cu118/dgl-2.4.0%2Bcu118-cp38-cp38-manylinux1_x86_64.whl"
-elif python_version == "39":
-    dgl_wheel_url = "https://data.dgl.ai/wheels/torch-2.4/cu118/dgl-2.4.0%2Bcu118-cp39-cp39-manylinux1_x86_64.whl"
-
+torch_version = importlib.metadata.version("torch")[:-2]
+dgl_wheel_url = f"https://data.dgl.ai/wheels/torch-{torch_version}/cu118/dgl-2.4.0%2Bcu118-cp{python_version}-cp{python_version}-manylinux1_x86_64.whl"
 if dgl_wheel_url:
     requirements.append(f"dgl @ {dgl_wheel_url}")
 
