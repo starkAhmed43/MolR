@@ -1,4 +1,22 @@
+import sys
 from setuptools import setup, find_packages
+
+with open('requirements.txt') as f:
+    requirements = f.read().splitlines()
+
+python_version = f"{sys.version_info.major}{sys.version_info.minor}"
+dgl_wheel_url = None
+if python_version == "310":
+    dgl_wheel_url = "https://data.dgl.ai/wheels/torch-2.4/cu118/dgl-2.4.0%2Bcu118-cp310-cp310-manylinux1_x86_64.whl"
+elif python_version == "311":
+    dgl_wheel_url = "https://data.dgl.ai/wheels/torch-2.4/cu118/dgl-2.4.0%2Bcu118-cp311-cp311-manylinux1_x86_64.whl"
+elif python_version == "38":
+    dgl_wheel_url = "https://data.dgl.ai/wheels/torch-2.4/cu118/dgl-2.4.0%2Bcu118-cp38-cp38-manylinux1_x86_64.whl"
+elif python_version == "39":
+    dgl_wheel_url = "https://data.dgl.ai/wheels/torch-2.4/cu118/dgl-2.4.0%2Bcu118-cp39-cp39-manylinux1_x86_64.whl"
+
+if dgl_wheel_url:
+    requirements.append(f"dgl @ {dgl_wheel_url}")
 
 setup(
     name='MolR',
@@ -11,22 +29,13 @@ setup(
     url='https://github.com/hwwang55/MolR',
     packages=find_packages(include=['MolR', 'MolR.*']),
     include_package_data=True,
-    install_requires=[
-        'torch==1.8.1',
-        'dgl-cu110==0.6.1',
-        'pysmiles==1.0.1',
-        'scikit-learn==0.24.2',
-        'networkx==2.5.1',
-        'matplotlib==3.4.2',
-        'openbabel-wheel',
-        'scipy==1.7.0'
-    ],
+    install_requires=requirements,
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
     ],
-    python_requires='>=3.7',
+    python_requires='>=3.8',
     package_data={
         'MolR': ['models/**/*']
     },
