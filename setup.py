@@ -5,12 +5,6 @@ from setuptools import setup, find_packages
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
-python_version = f"{sys.version_info.major}{sys.version_info.minor}"
-torch_version = importlib.metadata.version("torch")[:-2]
-dgl_wheel_url = f"https://data.dgl.ai/wheels/torch-{torch_version}/cu118/dgl-2.4.0%2Bcu118-cp{python_version}-cp{python_version}-manylinux1_x86_64.whl"
-if dgl_wheel_url:
-    requirements.append(f"dgl @ {dgl_wheel_url}")
-
 setup(
     name='MolR',
     version='0.1.0',
