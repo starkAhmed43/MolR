@@ -101,15 +101,29 @@ For more results, please refer to our paper.
   ```
   Please see `example_usage()` function in `featurizer.py` for details, which should be easy to understand.
 
-### Required packages
+### Installation Instructions
 
-The code has been tested running under Python 3.7 and CUDA 11.0, with the following packages installed (along with their dependencies):
+The code has been tested running under Python 3.9 and CUDA 11.8, with the following packages installed (along with their dependencies):
 
-- torch == 1.8.1
-- dgl-cu110 == 0.6.1 (can also use dgl == 0.6.1 if run on CPU only)
-- pysmiles == 1.0.1
-- scikit-learn==0.24.2
-- networkx==2.5.1
-- matplotlib==3.4.2 (for `--task=visualization`)
-- openbabel==3.1.1 (for `--task=visualization` and `--subtask=ring`)
-- scipy==1.7.0
+```bash
+conda create -n molr -n python=3.9 -y
+conda activate molr
+```
+
+If your system has CUDA 11.x, (doesn't seem to work with CUDA 12.x) install PyTorch and DGL as follows:
+```bash
+pip install torch==2.4.0 --index-url https://download.pytorch.org/whl/cu118
+pip install dgl==2.4.0- -f https://data.dgl.ai/wheels/cu118/repo.html
+```
+
+Otherwise, install CPU only PyTorch and DGL:
+
+```bash
+pip install torch==2.4.0 --index-url https://download.pytorch.org/whl/cpu
+pip install dgl==2.4.0 -f https://data.dgl.ai/wheels/repo.html
+```
+
+Install MolR from this forked repository. The original repo doesn't have a setup.py configured.
+```bash
+pip install git+https://github.com/starkAhmed43/MolR.git
+```
