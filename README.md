@@ -120,7 +120,7 @@ Otherwise, install CPU only PyTorch and DGL:
 
 ```bash
 pip install torch==2.4.0 --index-url https://download.pytorch.org/whl/cpu
-pip install dgl==2.4.0 -f https://data.dgl.ai/wheels/repo.html
+pip install dgl -f https://data.dgl.ai/wheels/torch-2.4/cu118/repo.html
 ```
 
 Install MolR from this forked repository. The original repo doesn't have a setup.py configured.
