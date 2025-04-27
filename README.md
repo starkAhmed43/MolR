@@ -106,7 +106,7 @@ For more results, please refer to our paper.
 The code has been tested running under Python 3.9 and CUDA 11.8, with the following packages installed (along with their dependencies):
 
 ```bash
-conda create -n molr -n python=3.9 -y
+conda create -n molr python=3.12 -y
 conda activate molr
 ```
 
